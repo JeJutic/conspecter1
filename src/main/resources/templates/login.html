@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<script type="text/javascript">
+    function save_username(){
+        const username = document.getElementById("username").value;
+        if (/^\w+$/.test(username)) {
+            document.cookie = "username=" + username;
+            document.location = "../"
+        }
+    }
+</script>
+<body>
+<main>
+        <label for="username"></label>
+        <input name="username" id="username" type="text" placeholder="username">
+        <input type="button" value="Submit" onclick="save_username()">
+    <p>
+        There is no password used here: usernames are only for keeping your score.
+    </p>
+</main>
+</body>
+</html>

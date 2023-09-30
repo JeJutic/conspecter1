@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>conspects</title>
+</head>
+<body>
+<main>
+    <a href="/../">Back</a>
+
+    <div th:each="conspect : ${conspects}">
+        <a th:href="@{/task/__${conspect.id}__}"
+           th:text="${conspect.path + ' ' + conspect.score + '/' + conspect.outOf}">
+        </a>
+    </div>
+</main>
+</body>
+</html>

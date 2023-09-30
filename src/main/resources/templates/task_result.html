@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>task result</title>
+</head>
+<body>
+<main>
+    <p th:text="${task.text}"></p>
+    <p th:text="${'Your solution - ' + solution}"></p>
+    <p th:text="${'Right answer - ' + task.answer}"></p>
+    <p th:text="${score.score + '/' + score.outOf}"></p>
+    <p th:text="${status}"></p>
+</main>
+</body>
+</html>

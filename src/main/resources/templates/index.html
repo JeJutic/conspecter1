@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+</head>
+<body>
+<main>
+    <div th:each="repo : ${repos}">
+        <a th:href="@{/repo/__${repo.id}__}" th:text="${repo.fullName}"></a>
+    </div>
+</main>
+</body>
+</html>
