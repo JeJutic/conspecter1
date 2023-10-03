@@ -16,6 +16,34 @@ public class JdbcConspectsRepository implements ConspectsRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private int getId(String path, int repoId) {
+        var ids = jdbcTemplate.query(
+                "SELECT id FROM conspects WHERE path = ? and repo_id = ?",
+                (ResultSet row, int colNum) -> row.getInt(1),
+                path,
+                repoId
+        );
+        if (ids.isEmpty()) {
+            return -1;
+        }
+        return ids.get(0);
+    }
+
+
+    @Override
+    public int getIdOrCreate(String path, int repoId) {
+        int id = getId(path, repoId);
+        if (id == -1) {
+            jdbcTemplate.update(
+                    "INSERT INTO conspects (path, repo_id) VALUES (?, ?)",
+                    path,
+                    repoId
+            );
+            id = getId(path, repoId);
+        }
+        return id;
+    }
+
     @Override
     public List<ConspectDto> findAll(String username, int repoId) {
         return jdbcTemplate.query(

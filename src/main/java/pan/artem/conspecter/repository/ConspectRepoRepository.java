@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface ConspectRepoRepository {
 
+    int getId(String author, String pathName);
+
     List<ConspectRepo> findAll();
 
-    void create(ConspectRepo conspect);
+    void create(String fullName, String author, String pathName);
+
+    void removeEmpty();
 }

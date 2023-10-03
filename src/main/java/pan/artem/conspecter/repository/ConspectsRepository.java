@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface ConspectsRepository {
 
+    int getIdOrCreate(String path, int repoId);
+
     List<ConspectDto> findAll(String username, int repoId);
 }

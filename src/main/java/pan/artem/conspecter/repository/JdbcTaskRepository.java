@@ -16,6 +16,16 @@ public class JdbcTaskRepository implements TaskRepository {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
+    public void create(String text, String answer, int conspectId) {
+        jdbcTemplate.update(
+                "INSERT INTO tasks (text, answer, conspect_id) VALUES (?, ?, ?)",
+                text,
+                answer,
+                conspectId
+        );
+    }
+
+    @Override
     public List<TaskDto> findUnsolved(int conspectId, String username) {
         return jdbcTemplate.query(
                 "SELECT id, text, answer " +
@@ -24,6 +34,16 @@ public class JdbcTaskRepository implements TaskRepository {
                 this::mapRowToTaskDto,
                 conspectId,
                 username
+        );
+    }
+
+    @Override
+    public void deleteTasksFromRepo(int repoId) {
+        jdbcTemplate.update(
+                "DELETE tasks FROM tasks " +
+                        "INNER JOIN conspects ON conspects.id = conspect_id " +
+                        "WHERE repo_id = ?",
+                repoId
         );
     }
 
