@@ -59,9 +59,9 @@ public class JdbcConspectRepoRepository implements ConspectRepoRepository {
     @Override
     public void removeEmpty() {
         jdbcTemplate.update(
-                "DELETE conspects FROM conspects " +
-                        "LEFT JOIN tasks ON conspects.id = conspect_id " +
-                        "WHERE conspect_id IS NULL"
+                "DELETE FROM conspects WHERE conspects.id IN " +
+                        "(SELECT co.id FROM conspects co LEFT JOIN tasks ON co.id = conspect_id " +
+                        "WHERE conspect_id IS NULL)"
         );
     }
 }

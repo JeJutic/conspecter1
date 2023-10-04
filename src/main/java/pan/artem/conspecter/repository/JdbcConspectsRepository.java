@@ -1,10 +1,11 @@
 package pan.artem.conspecter.repository;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import pan.artem.conspecter.dto.ConspectDto;
-import pan.artem.conspecter.dto.ConspectRepo;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ import java.util.List;
 @Repository
 public class JdbcConspectsRepository implements ConspectsRepository {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final JdbcTemplate jdbcTemplate;
 
     private int getId(String path, int repoId) {
@@ -32,6 +34,8 @@ public class JdbcConspectsRepository implements ConspectsRepository {
 
     @Override
     public int getIdOrCreate(String path, int repoId) {
+        logger.info("Getting Id of conspect with path {} and repo id {}", path, repoId);
+
         int id = getId(path, repoId);
         if (id == -1) {
             jdbcTemplate.update(
@@ -40,6 +44,7 @@ public class JdbcConspectsRepository implements ConspectsRepository {
                     repoId
             );
             id = getId(path, repoId);
+            logger.info("Created conspect with id: {}", id);
         }
         return id;
     }

@@ -16,13 +16,20 @@ public class JdbcTaskRepository implements TaskRepository {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void create(String text, String answer, int conspectId) {
+    public int create(String text, String answer, int conspectId) {
         jdbcTemplate.update(
                 "INSERT INTO tasks (text, answer, conspect_id) VALUES (?, ?, ?)",
                 text,
                 answer,
                 conspectId
         );
+        return jdbcTemplate.query(      // FIXME: probably not the best way to obtain new id
+                "SELECT id FROM tasks WHERE text = ? and answer = ? and conspect_id = ?",
+                (ResultSet row, int colNum) -> row.getInt(1),
+                text,
+                answer,
+                conspectId
+        ).stream().findAny().orElse(0);
     }
 
     @Override
@@ -40,9 +47,9 @@ public class JdbcTaskRepository implements TaskRepository {
     @Override
     public void deleteTasksFromRepo(int repoId) {
         jdbcTemplate.update(
-                "DELETE tasks FROM tasks " +
-                        "INNER JOIN conspects ON conspects.id = conspect_id " +
-                        "WHERE repo_id = ?",
+                "DELETE FROM tasks WHERE tasks.id IN (SELECT t.id " +
+                        "FROM tasks t INNER JOIN conspects ON conspects.id = conspect_id " +
+                        "WHERE repo_id = ?)",
                 repoId
         );
     }

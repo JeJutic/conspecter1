@@ -1,6 +1,5 @@
 package pan.artem.conspecter.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pan.artem.conspecter.controller.error.ErrorInfo;
@@ -8,6 +7,7 @@ import pan.artem.conspecter.controller.error.ScriptExecutionException;
 import pan.artem.conspecter.service.ConspectRepoMaintainer;
 
 import java.io.*;
+import java.text.ParseException;
 
 @RestController
 public class AdminController {
@@ -33,7 +33,7 @@ public class AdminController {
     public ResponseEntity<?> reloadConspectRepo(
             @PathVariable String author,
             @PathVariable String pathName
-    ) throws IOException, InterruptedException {
+    ) throws IOException, InterruptedException, ParseException {
         conspectRepoMaintainer.reloadConspectRepo(author, pathName);
         return ResponseEntity.ok().build();
     }
