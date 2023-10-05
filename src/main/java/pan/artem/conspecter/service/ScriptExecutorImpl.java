@@ -58,7 +58,7 @@ public class ScriptExecutorImpl implements ScriptExecutor {
                 null,
                 new File(basePath)
         );
-        ScriptExecutorImpl.StreamGobbler streamGobbler = new ScriptExecutorImpl.StreamGobbler(
+        var streamGobbler = new ScriptExecutorImpl.StreamGobbler(
                 process,
                 System.out::println
         );
@@ -77,7 +77,7 @@ public class ScriptExecutorImpl implements ScriptExecutor {
                 null,
                 new File(basePath)
         );
-        ScriptExecutorImpl.StreamGobbler streamGobbler = new ScriptExecutorImpl.StreamGobbler(
+        var streamGobbler = new ScriptExecutorImpl.StreamGobbler(
                 process,
                 s -> {
                     result.add(s);
@@ -90,5 +90,23 @@ public class ScriptExecutorImpl implements ScriptExecutor {
             throw new ScriptExecutionException(exitCode, streamGobbler.getErrorMessage());
         }
         return result;
+    }
+
+    @Override
+    public void generatePdf(int taskId) throws IOException, InterruptedException {  // FIXME: process executing needs refactoring
+        Process process = Runtime.getRuntime().exec(
+                new String[]{"/bin/sh", "scripts/gen_pdf.sh", String.valueOf(taskId)},
+                null,
+                new File(basePath)
+        );
+        var streamGobbler = new ScriptExecutorImpl.StreamGobbler(
+                process,
+                System.out::println
+        );
+        streamGobbler.run();
+        int exitCode = process.waitFor();   // FIXME
+//        if (exitCode != 0) {
+//            throw new ScriptExecutionException(exitCode, streamGobbler.getErrorMessage());
+//        }
     }
 }

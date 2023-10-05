@@ -5,5 +5,5 @@ import java.text.ParseException;
 
 public interface ConspectInitializer {
 
-    void initialize(int conspectId, String path) throws IOException, ParseException;
+    void initialize(int conspectId, String path) throws IOException, ParseException, InterruptedException;
 }

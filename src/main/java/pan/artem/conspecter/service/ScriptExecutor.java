@@ -10,4 +10,6 @@ public interface ScriptExecutor {
     void loadConspectRepo(String url, String author, String pathName) throws ScriptExecutionException, IOException, InterruptedException;
 
     List<String> updateConspectFiles(String author, String pathName) throws ScriptExecutionException, InterruptedException, IOException;
+
+    void generatePdf(int taskId) throws IOException, InterruptedException;
 }

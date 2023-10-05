@@ -1,6 +1,11 @@
 package pan.artem.conspecter.controller;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,17 +14,29 @@ import pan.artem.conspecter.dto.TaskDto;
 import pan.artem.conspecter.repository.CurrentTaskRepository;
 import pan.artem.conspecter.repository.TaskRepository;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Random;
 
-@AllArgsConstructor
 @Controller
+@RequestMapping("/task")
 public class TaskController {
+
+    @Value("${conspecter.basePath}")
+    private String basePath;
 
     private final TaskRepository taskRepository;
     private final CurrentTaskRepository currentTaskRepository;
     private final SolutionIdentifier solutionIdentifier;
 
-    @GetMapping("/task")
+    public TaskController(TaskRepository taskRepository, CurrentTaskRepository currentTaskRepository, SolutionIdentifier solutionIdentifier) {
+        this.taskRepository = taskRepository;
+        this.currentTaskRepository = currentTaskRepository;
+        this.solutionIdentifier = solutionIdentifier;
+    }
+
+    @GetMapping("/")
     public String showTask(
             @CookieValue(value = "username", defaultValue = "") String username,
             Model model
@@ -32,7 +49,7 @@ public class TaskController {
         return "task";
     }
 
-    @GetMapping("/task/{conspectId}")
+    @GetMapping("/{conspectId}")
     public String showTask(
             @CookieValue(value = "username", defaultValue = "") String username,
             @PathVariable("conspectId") int conspectId,
@@ -56,7 +73,21 @@ public class TaskController {
         return "task";
     }
 
-    @PostMapping("/task/**")
+    @GetMapping("/download/{taskId}")
+    public ResponseEntity<Resource> download(@PathVariable int taskId) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=task.pdf");
+        File file = new File(basePath + "tasks/" + taskId + ".pdf");
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    @PostMapping("/**")
     public String showResult(
             @CookieValue(value = "username", defaultValue = "") String username,
             @RequestParam("solution") String solution,

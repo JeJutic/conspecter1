@@ -1,6 +1,5 @@
 package pan.artem.conspecter.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +25,7 @@ public class MainController {
         }
         var currentTask = currentTaskRepository.getTask(username);
         if (currentTask.isPresent()) {
-            return "redirect:/task";
+            return "redirect:/task/";
         }
         var repos = conspectRepoRepository.findAll();
         model.addAttribute("repos", repos);

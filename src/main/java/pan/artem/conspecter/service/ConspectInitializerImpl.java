@@ -11,9 +11,8 @@ import pan.artem.conspecter.parser.LatexReader;
 import pan.artem.conspecter.parser.ParsingProperties;
 import pan.artem.conspecter.repository.TaskRepository;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
@@ -25,9 +24,11 @@ public class ConspectInitializerImpl implements ConspectInitializer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final TaskRepository taskRepository;
+    private final ScriptExecutor scriptExecutor;
 
-    public ConspectInitializerImpl(TaskRepository taskRepository) {
+    public ConspectInitializerImpl(TaskRepository taskRepository, ScriptExecutor scriptExecutor) {
         this.taskRepository = taskRepository;
+        this.scriptExecutor = scriptExecutor;
     }
 
     private int countCommandEntrances(String line, String command) {
@@ -64,25 +65,30 @@ public class ConspectInitializerImpl implements ConspectInitializer {
         return res.toString();
     }
 
-    public void removeFirstN(Deque<String> lines, int n) {  // TODO
+    public int removeFirstN(Deque<String> lines, int n) {  // TODO
+        int remCnt = 0;
         for (int i = 0; i < n; i++) {
-            lines.removeFirst();
+            String removed = lines.removeFirst();
+            remCnt += removed.length();
         }
+        return remCnt;
     }
 
     @Override
-    public void initialize(int conspectId, String path) throws ParseException, IOException {
+    public void initialize(int conspectId, String path) throws ParseException, IOException, InterruptedException {
         logger.info("Initializing conspect {} with path {}", conspectId, path);
 
-        LatexReader latexReader = new LatexReader(new BufferedReader(new FileReader(basePath + path)));
+        LatexReader latexReader = new LatexReader(new BufferedReader(
+                        new FileReader(basePath + path, StandardCharsets.UTF_8)
+        ));
         StringBuilder headers = new StringBuilder();
         String line;
         while (true) {
             line = latexReader.readLine().get();    // FIXME
+            headers.append(line).append('\n');
             if (countCommandEntrances(line, "\\begin{document}") == 1) {
                 break;
             }
-            headers.append(line).append('\n');
             if (headers.length() > ParsingProperties.getMaxLineLength()) {
                 throw new ParseException("Too many headers " + headers, headers.length());
             }
@@ -106,31 +112,53 @@ public class ConspectInitializerImpl implements ConspectInitializer {
 
             int beginCount = countCommandEntrances(line, "\\begin");
             int endCount = countCommandEntrances(line, "\\end");
-            if (beginCount + endCount > 1) {
-                throw new ParseException(
-                        "Not allowed to have multiple \\begin or \\end commands on the same line: " + line,
-                        0
-                );
+//            if (Math.abs(beginCount - endCount) > 1) {
+//                throw new ParseException(
+//                        "Not allowed to have multiple \\begin or \\end commands on the same line: " + line,
+//                        0
+//                );
+//            }
+
+            for (int i = 0; i < beginCount - endCount; i++) {
+                nested.addLast(cur);
             }
 
-            if (beginCount == 1) {
-                nested.addLast(cur);
-            } else if (endCount == 1) {
-                int st = nested.removeLast();
-                if (charSum > ParsingProperties.getMinTaskSize()) {
-                    String taskText = getLastN(lines, cur - st + 1);
-                    List<Task> tasks = new TaskMakerImpl().makeTasks(taskText, 3);
-                    for (var task : tasks) {
-                        int taskId = taskRepository.create(taskText, task.answer(), conspectId);
-                        taskSaver.saveTask(taskText, basePath + "tasks/" + taskId);
-                        // TODO: ScriptExecutor for pdflatex
-                    }
-                }
-            } else if (nested.isEmpty()) {
+            if (nested.isEmpty()) {
                 lines.removeLast();
                 charSum = 0;
+            } else {
+                for (int i = 0; i < endCount - beginCount; i++) {
+                    if (nested.isEmpty()) {
+                        throw new ParseException("More \\end than \\begin", latexReader.linesRead());   // TODO: add info about conspectId in domain exception
+                    }
+                    int st = nested.removeLast();
+                    if (charSum > ParsingProperties.getMinTaskSize()) {
+                        String taskText = getLastN(lines, cur - st + 1);
+                        List<Task> tasks = new TaskMakerImpl().makeTasks(taskText, 3);
+                        for (var task : tasks) {
+                            int taskId = taskRepository.create(task.text(), task.answer(), conspectId);
+                            taskSaver.saveTask(task.text(), basePath + "tasks/" + taskId + ".tex");
+                            scriptExecutor.generatePdf(taskId);
+                            // TODO: ScriptExecutor for pdflatex
+                        }
+                    }
+                }
+
+                while (charSum > ParsingProperties.getMaxLineLength()) {
+                    int first = nested.removeFirst();
+                    if (nested.isEmpty()) {
+                        lines.clear();
+                        charSum = 0;
+                        break;
+                    }
+                    charSum -= removeFirstN(lines, nested.getFirst() - first);
+                }
             }
             logger.info("Nested tags parsed by the end of conspect parsing: {}", nested);
         }
+        if (!nested.isEmpty()) {
+            throw new ParseException("More \\begin than \\end", latexReader.linesRead());
+        }
+        latexReader.close();
     }
 }

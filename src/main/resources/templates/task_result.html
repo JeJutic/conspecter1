@@ -6,11 +6,13 @@
 </head>
 <body>
 <main>
-    <p th:text="${task.text}"></p>
+    <a href="../../">Main menu</a>
+    <pre th:text="${task.text}"></pre>
     <p th:text="${'Your solution - ' + solution}"></p>
     <p th:text="${'Right answer - ' + task.answer}"></p>
     <p th:text="${score.score + '/' + score.outOf}"></p>
     <p th:text="${status}"></p>
+    <a href="../">Task from the same conspect</a>
 </main>
 </body>
 </html>

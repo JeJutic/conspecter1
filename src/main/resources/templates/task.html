@@ -6,7 +6,7 @@
 </head>
 <body>
 <main>
-    <p th:text="${task.text}"></p>
+    <pre th:text="${task.text}"></pre>
     <form method="post">
         <label for="solution"></label>
         <input name="solution"
@@ -15,6 +15,7 @@
                placeholder="Enter skipped parts here, separate it by whitespaces">
         <input type="submit" value="Submit">
     </form>
+    <a target=”_blank” th:href="@{./download/__${task.id}__}">Pdf view</a>
 </main>
 </body>
 </html>

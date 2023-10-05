@@ -7,6 +7,7 @@ import java.util.Optional;
 public class ShortLineReader implements LineReader {
 
     private final Reader in;
+    private int linesRead = 0;
 
     public ShortLineReader(Reader in) {
         this.in = in;
@@ -21,6 +22,7 @@ public class ShortLineReader implements LineReader {
             return Optional.empty();
         }
         for (; went < ParsingProperties.getMaxLineLength() && r >= 0; went++) {
+            linesRead++;
             char c = (char) r;
             if (c == '\n') {
                 break;
@@ -29,5 +31,15 @@ public class ShortLineReader implements LineReader {
             r = in.read();
         }
         return Optional.of(sb.toString());
+    }
+
+    @Override
+    public int linesRead() {
+        return linesRead;
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 }

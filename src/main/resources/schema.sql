@@ -36,7 +36,7 @@ CREATE TABLE current_task (
 INSERT INTO repos (fullName, author, pathName) VALUES
     ('super repo', 'jejutic', 'itsme'),
     ('another guy yes', 'him', 'his'),
-    ('yess', 'don', 'con');
+    ('Матлогика', 'shd', 'logic2023a');
 
 INSERT INTO conspects (path, repo_id) VALUES ( '/usr/bin', 1 ), ( '/yes/me', 1 );
 
