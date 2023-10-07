@@ -1,12 +1,12 @@
 CREATE TABLE repos (
-    id int PRIMARY KEY AUTO_INCREMENT,
+    id serial PRIMARY KEY,
     fullName varchar(255),
     author varchar(255) NOT NULL,
     pathName varchar(255) NOT NULL
 );
 
 CREATE TABLE conspects (
-    id int PRIMARY KEY AUTO_INCREMENT,
+    id serial PRIMARY KEY,
     path varchar(255) NOT NULL,
     repo_id int NOT NULL
 );
@@ -17,7 +17,7 @@ CREATE TABLE user_conspect (
 );
 
 CREATE TABLE tasks (
-    id int PRIMARY KEY AUTO_INCREMENT,
+    id serial PRIMARY KEY,
     text varchar NOT NULL,
     answer varchar NOT NULL,
     conspect_id int NOT NULL
@@ -35,8 +35,7 @@ CREATE TABLE current_task (
 
 INSERT INTO repos (fullName, author, pathName) VALUES
     ('super repo', 'jejutic', 'itsme'),
-    ('another guy yes', 'him', 'his'),
-    ('Матлогика', 'shd', 'logic2023a');
+    ('another guy yes', 'him', 'his');
 
 INSERT INTO conspects (path, repo_id) VALUES ( '/usr/bin', 1 ), ( '/yes/me', 1 );
 

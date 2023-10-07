@@ -20,7 +20,7 @@ public class MainController {
             @CookieValue(value = "username", defaultValue = "") String username,
             Model model
     ) {
-        if (username.isEmpty()) {
+        if (username.isEmpty() || !username.contains("ктшник")) {   // FIXME: authentication
             return "redirect:/login";
         }
         var currentTask = currentTaskRepository.getTask(username);

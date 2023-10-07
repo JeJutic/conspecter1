@@ -18,7 +18,7 @@ public class AdminController {
         this.conspectRepoMaintainer = conspectRepoMaintainer;
     }
 
-    @GetMapping("/repos/{author}/{pathName}")
+    @GetMapping("/repos/{author}/{pathName}/")
     public ResponseEntity<?> loadConspectRepo(
             @RequestParam String url,
             @RequestParam String fullName,

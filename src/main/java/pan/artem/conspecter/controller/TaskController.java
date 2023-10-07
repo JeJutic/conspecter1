@@ -38,9 +38,12 @@ public class TaskController {
 
     @GetMapping("/")
     public String showTask(
-            @CookieValue(value = "username", defaultValue = "") String username,
+            @CookieValue("username") String username,
             Model model
     ) {
+        if (!username.contains("ктшник")) {
+            return "redirect:../../login";
+        }
         var currentTask = currentTaskRepository.getTask(username);
         if (currentTask.isEmpty()) {
             return "redirect:../";
@@ -51,10 +54,13 @@ public class TaskController {
 
     @GetMapping("/{conspectId}")
     public String showTask(
-            @CookieValue(value = "username", defaultValue = "") String username,
+            @CookieValue("username") String username,
             @PathVariable("conspectId") int conspectId,
             Model model
     ) {
+        if (!username.contains("ктшник")) {
+            return "redirect:../../login";
+        }
         TaskDto task;
         var currentTask = currentTaskRepository.getTask(username);
         if (currentTask.isEmpty()) {
@@ -73,26 +79,26 @@ public class TaskController {
         return "task";
     }
 
-    @GetMapping("/download/{taskId}")
+    @GetMapping("/view/{taskId}")
     public ResponseEntity<Resource> download(@PathVariable int taskId) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=task.pdf");
         File file = new File(basePath + "tasks/" + taskId + ".pdf");
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
         return ResponseEntity.ok()
-                .headers(headers)
                 .contentLength(file.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
 
     @PostMapping("/**")
     public String showResult(
-            @CookieValue(value = "username", defaultValue = "") String username,
+            @CookieValue("username") String username,
             @RequestParam("solution") String solution,
             Model model
     ) {
+        if (!username.contains("ктшник")) {
+            return "redirect:../../login";
+        }
         var currentTask = currentTaskRepository.getTask(username);
         if (currentTask.isEmpty()) {
             return "redirect:../";

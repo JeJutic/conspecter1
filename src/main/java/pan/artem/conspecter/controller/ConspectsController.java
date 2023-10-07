@@ -20,11 +20,11 @@ public class ConspectsController {
 
     @GetMapping("/repo/{repoId}")
     public String showMain(
-            @CookieValue(value = "username", defaultValue = "") String username,
+            @CookieValue("username") String username,
             @PathVariable("repoId") int repoId,
             Model model
     ) {
-        if (username.isEmpty()) {
+        if (username.isEmpty() || !username.contains("ктшник")) {
             return "redirect:/login";
         }
         var conspects = conspectsRepository.findAll(username, repoId);

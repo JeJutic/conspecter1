@@ -18,7 +18,7 @@ public class TaskSaver {
     }
 
     public void saveTask(String taskText, String path) throws IOException {
-        logger.info("Saving task with text: {}\non {}", taskText, path);
+        logger.info("Saving task with on {}", path);
         BufferedWriter out = new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8));
         out.write(headers);
         out.newLine();
