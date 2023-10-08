@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public class JdbcCurrentTaskRepository implements CurrentTaskRepository {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+//    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -33,8 +33,10 @@ public class JdbcCurrentTaskRepository implements CurrentTaskRepository {
         return jdbcTemplate.query(
                 "SELECT tasks.id as id, text, answer " +
                         "FROM current_task INNER JOIN tasks " +
-                        "ON current_task.task_id = tasks.id",
-                this::mapRowToTaskDto
+                        "ON current_task.task_id = tasks.id " +
+                        "WHERE username = ?",
+                this::mapRowToTaskDto,
+                username
         ).stream().findAny();
     }
 
